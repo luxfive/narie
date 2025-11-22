@@ -1,14 +1,24 @@
 import React, { useState } from 'react';
-import { Sparkles, Loader2, RefreshCw, Wind } from 'lucide-react';
+import { Sparkles, Loader2, RefreshCw, Wind, ArrowRight, ShoppingBag, Check } from 'lucide-react';
 import { getScentRecommendation } from '../services/geminiService';
-import { AIRecommendation, LoadingState } from '../types';
+import { AIRecommendation, LoadingState, Product } from '../types';
 import { useLanguage } from '../context/LanguageContext';
+import { PRODUCTS_EN, PRODUCTS_VI } from '../data/products';
+import { useCart } from '../context/CartContext';
+import ProductDetailModal from './ProductDetailModal';
 
 const ScentAI: React.FC = () => {
   const [mood, setMood] = useState('');
   const [status, setStatus] = useState<LoadingState>(LoadingState.IDLE);
   const [recommendation, setRecommendation] = useState<AIRecommendation | null>(null);
-  const { t, language } = useLanguage();
+  const [recommendedProduct, setRecommendedProduct] = useState<Product | null>(null);
+  const [showDetailModal, setShowDetailModal] = useState(false);
+  const [isAdded, setIsAdded] = useState(false);
+  
+  const { t, language, formatPrice } = useLanguage();
+  const { addItem } = useCart();
+  
+  const products = language === 'vi' ? PRODUCTS_VI : PRODUCTS_EN;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -16,15 +26,39 @@ const ScentAI: React.FC = () => {
 
     setStatus(LoadingState.LOADING);
     setRecommendation(null);
+    setRecommendedProduct(null);
+
+    // Prepare minimal inventory for AI context
+    const inventory = products
+      .filter(p => p.category !== 'accessory')
+      .map(p => ({
+        id: p.id,
+        name: p.name,
+        notes: p.scentNotes
+      }));
 
     try {
-      const result = await getScentRecommendation(mood, language);
+      const result = await getScentRecommendation(mood, language, inventory);
       setRecommendation(result);
+      
+      if (result.recommendedProductId) {
+        const match = products.find(p => p.id === result.recommendedProductId);
+        if (match) {
+          setRecommendedProduct(match);
+        }
+      }
+      
       setStatus(LoadingState.SUCCESS);
     } catch (error) {
       console.error(error);
       setStatus(LoadingState.ERROR);
     }
+  };
+
+  const handleAddToCart = (product: Product) => {
+    addItem(product, 1);
+    setIsAdded(true);
+    setTimeout(() => setIsAdded(false), 2000);
   };
 
   return (
@@ -95,56 +129,93 @@ const ScentAI: React.FC = () => {
           {/* Right Side: Output Display */}
           <div className="w-full lg:w-1/2 min-h-[400px] flex justify-center perspective-1000">
             {status === LoadingState.SUCCESS && recommendation ? (
-              <div className="w-full max-w-md bg-gradient-to-br from-stone-800/60 to-stone-900/60 backdrop-blur-3xl border border-white/10 p-8 md:p-12 animate-fade-in-up rounded-3xl shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] relative overflow-hidden">
-                
-                {/* Glass Highlight */}
-                <div className="absolute -top-24 -left-24 w-48 h-48 bg-white/5 rounded-full blur-3xl pointer-events-none"></div>
+              <div className="flex flex-col gap-6 w-full max-w-md">
+                  <div className="w-full bg-gradient-to-br from-stone-800/60 to-stone-900/60 backdrop-blur-3xl border border-white/10 p-8 md:p-12 animate-fade-in-up rounded-3xl shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] relative overflow-hidden">
+                    
+                    {/* Glass Highlight */}
+                    <div className="absolute -top-24 -left-24 w-48 h-48 bg-white/5 rounded-full blur-3xl pointer-events-none"></div>
 
-                <span className="text-amber-400 text-xs tracking-[0.2em] uppercase block mb-4 text-center relative z-10">{t('ai.result.concept')}</span>
-                <h3 className="text-3xl font-serif text-center mb-2 relative z-10 text-white drop-shadow-sm">{recommendation.candleName}</h3>
-                <div className="flex justify-center gap-2 mb-6 relative z-10">
-                   {[...Array(5)].map((_, i) => (
-                     <div key={i} className={`h-1 w-8 rounded-full transition-all duration-500 ${i < recommendation.intensityLevel ? 'bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.5)]' : 'bg-stone-700/50'}`}></div>
-                   ))}
-                </div>
-                
-                <div className="space-y-6 relative z-10">
-                  <div>
-                    <p className="text-stone-200 italic text-center leading-relaxed border-t border-b border-white/10 py-6 font-light">
-                      "{recommendation.description}"
-                    </p>
-                  </div>
-
-                  <div>
-                    <h4 className="text-xs text-stone-500 uppercase tracking-widest mb-3 text-center">{t('ai.result.notes')}</h4>
-                    <div className="flex flex-wrap justify-center gap-3">
-                      {recommendation.scentProfile.map((note, index) => (
-                        <span key={index} className="bg-white/5 text-stone-200 px-4 py-1.5 text-sm rounded-full border border-white/10 backdrop-blur-sm shadow-sm">
-                          {note}
-                        </span>
+                    <span className="text-amber-400 text-xs tracking-[0.2em] uppercase block mb-4 text-center relative z-10">{t('ai.result.concept')}</span>
+                    <h3 className="text-3xl font-serif text-center mb-2 relative z-10 text-white drop-shadow-sm">{recommendation.candleName}</h3>
+                    <div className="flex justify-center gap-2 mb-6 relative z-10">
+                      {[...Array(5)].map((_, i) => (
+                        <div key={i} className={`h-1 w-8 rounded-full transition-all duration-500 ${i < recommendation.intensityLevel ? 'bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.5)]' : 'bg-stone-700/50'}`}></div>
                       ))}
                     </div>
+                    
+                    <div className="space-y-6 relative z-10">
+                      <div>
+                        <p className="text-stone-200 italic text-center leading-relaxed border-t border-b border-white/10 py-6 font-light">
+                          "{recommendation.description}"
+                        </p>
+                      </div>
+
+                      <div>
+                        <h4 className="text-xs text-stone-500 uppercase tracking-widest mb-3 text-center">{t('ai.result.notes')}</h4>
+                        <div className="flex flex-wrap justify-center gap-3">
+                          {recommendation.scentProfile.map((note, index) => (
+                            <span key={index} className="bg-white/5 text-stone-200 px-4 py-1.5 text-sm rounded-full border border-white/10 backdrop-blur-sm shadow-sm">
+                              {note}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="bg-amber-900/10 p-5 rounded-xl border border-amber-500/20 backdrop-blur-sm">
+                          <p className="text-amber-100/90 text-sm text-center">
+                            <span className="font-bold text-amber-200 block mb-1">{t('ai.result.why')}</span>
+                            {recommendation.moodMatch}
+                          </p>
+                      </div>
+                    </div>
                   </div>
+                  
+                  {/* Recommended Product Card */}
+                  {recommendedProduct && (
+                    <div className="bg-white/5 backdrop-blur-xl border border-white/10 p-4 rounded-3xl animate-fade-in-up animation-delay-200 flex items-center gap-4 relative overflow-hidden hover:bg-white/10 transition-all">
+                        <div className="w-20 h-20 rounded-xl overflow-hidden bg-stone-100 flex-shrink-0 border border-white/10">
+                             <img src={recommendedProduct.image} alt={recommendedProduct.name} className="w-full h-full object-cover" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1">
+                                <Sparkles className="w-3 h-3 text-amber-400" />
+                                <span className="text-[10px] uppercase tracking-widest text-amber-200">{t('ai.recommendation')}</span>
+                            </div>
+                            <h4 className="text-lg font-serif font-bold text-white truncate">{recommendedProduct.name}</h4>
+                            <p className="text-stone-400 text-sm">{formatPrice(recommendedProduct.price, recommendedProduct.priceVND)}</p>
+                        </div>
+                        
+                        <div className="flex flex-col gap-2">
+                            <button 
+                                onClick={() => handleAddToCart(recommendedProduct)}
+                                className={`w-10 h-10 rounded-full flex items-center justify-center transition-all shadow-lg ${isAdded ? 'bg-green-500 text-white' : 'bg-white text-stone-900 hover:scale-110'}`}
+                                title={t('product.addToCart')}
+                            >
+                                {isAdded ? <Check className="w-5 h-5" /> : <ShoppingBag className="w-5 h-5" />}
+                            </button>
+                             <button 
+                                onClick={() => setShowDetailModal(true)}
+                                className="w-10 h-10 rounded-full bg-white/10 border border-white/20 text-white flex items-center justify-center hover:bg-white/20 hover:scale-110 transition-all"
+                                title={t('product.quickView')}
+                            >
+                                <ArrowRight className="w-5 h-5" />
+                            </button>
+                        </div>
+                    </div>
+                  )}
 
-                   <div className="bg-amber-900/10 p-5 rounded-xl border border-amber-500/20 backdrop-blur-sm">
-                      <p className="text-amber-100/90 text-sm text-center">
-                        <span className="font-bold text-amber-200 block mb-1">{t('ai.result.why')}</span>
-                        {recommendation.moodMatch}
-                      </p>
-                   </div>
-
-                   <button 
+                  <button 
                       onClick={() => {
                         setMood('');
                         setStatus(LoadingState.IDLE);
                         setRecommendation(null);
+                        setRecommendedProduct(null);
                       }}
-                      className="w-full flex items-center justify-center gap-2 text-stone-400 hover:text-white text-sm mt-4 transition-colors"
+                      className="flex items-center justify-center gap-2 text-stone-400 hover:text-white text-sm mt-2 transition-colors"
                     >
                       <RefreshCw className="w-3 h-3" />
                       {t('ai.result.again')}
-                   </button>
-                </div>
+                  </button>
               </div>
             ) : (
               // Empty State / Placeholder with Glass Effect
@@ -159,6 +230,13 @@ const ScentAI: React.FC = () => {
 
         </div>
       </div>
+
+      {showDetailModal && recommendedProduct && (
+        <ProductDetailModal 
+            product={recommendedProduct} 
+            onClose={() => setShowDetailModal(false)} 
+        />
+      )}
     </section>
   );
 };

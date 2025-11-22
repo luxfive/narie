@@ -5,8 +5,16 @@ import { useLanguage } from '../context/LanguageContext';
 const Hero: React.FC = () => {
   const { t } = useLanguage();
 
+  const scrollToSection = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
+    e.preventDefault();
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
-    <section className="relative h-[95vh] w-full overflow-hidden bg-brand-bg">
+    <section id="hero" className="relative h-[95vh] w-full overflow-hidden bg-brand-bg">
       {/* Background Video/Image */}
       <div className="absolute inset-0">
         <img 
@@ -33,14 +41,16 @@ const Hero: React.FC = () => {
         <div className="flex flex-col sm:flex-row gap-6 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
           <a 
             href="#collections"
-            className="group bg-brand-bg text-brand-dark px-10 py-4 flex items-center gap-3 hover:bg-white transition-all duration-500 rounded-full shadow-xl hover:shadow-2xl font-medium tracking-wide"
+            onClick={(e) => scrollToSection(e, 'collections')}
+            className="group bg-brand-bg text-brand-dark px-10 py-4 flex items-center gap-3 hover:bg-white transition-all duration-500 rounded-full shadow-xl hover:shadow-2xl font-medium tracking-wide cursor-pointer"
           >
             {t('hero.cta_shop')}
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </a>
            <a 
             href="#scent-ai"
-            className="group bg-white/10 backdrop-blur-xl border border-white/30 text-white px-10 py-4 flex items-center gap-3 hover:bg-white/20 transition-all duration-500 rounded-full font-medium tracking-wide"
+            onClick={(e) => scrollToSection(e, 'scent-ai')}
+            className="group bg-white/10 backdrop-blur-xl border border-white/30 text-white px-10 py-4 flex items-center gap-3 hover:bg-white/20 transition-all duration-500 rounded-full font-medium tracking-wide cursor-pointer"
           >
             <Sparkles className="w-4 h-4 text-stone-200" />
             {t('hero.cta_ai')}

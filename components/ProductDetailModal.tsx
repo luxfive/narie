@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
-import { X, Minus, Plus, ShoppingBag } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { X, Minus, Plus, ShoppingBag, Check } from 'lucide-react';
 import { Product } from '../types';
 import { useLanguage } from '../context/LanguageContext';
+import { useCart } from '../context/CartContext';
 
 interface ProductDetailModalProps {
   product: Product;
@@ -9,14 +10,42 @@ interface ProductDetailModalProps {
 }
 
 const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product, onClose }) => {
-  const { t } = useLanguage();
+  const { t, formatPrice, currency } = useLanguage();
+  const { addItem } = useCart();
   const [activeTab, setActiveTab] = useState<'description' | 'details' | 'shipping'>('description');
   const [quantity, setQuantity] = useState(1);
+  const [isAdded, setIsAdded] = useState(false);
+
+  // Close on Escape key
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, [onClose]);
+
+  const handleAddToCart = () => {
+    addItem(product, quantity);
+    
+    setIsAdded(true);
+    setTimeout(() => {
+      setIsAdded(false);
+    }, 2000);
+  };
 
   if (!product) return null;
 
+  const currentPrice = currency === 'USD' ? product.price : product.priceVND;
+  const totalPrice = currentPrice * quantity;
+
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+    <div 
+      className="fixed inset-0 z-[60] flex items-center justify-center p-4" 
+      role="dialog" 
+      aria-modal="true"
+      aria-labelledby="modal-title"
+    >
       <div className="absolute inset-0 bg-stone-900/30 backdrop-blur-sm transition-opacity" onClick={onClose}></div>
       
       {/* iOS Liquid Glass Style Modal */}
@@ -25,6 +54,7 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product, onClos
         {/* Close Button - iOS style circle */}
         <button 
           onClick={onClose}
+          aria-label="Close modal"
           className="absolute top-5 right-5 z-20 p-2 bg-white/40 backdrop-blur-md rounded-full hover:bg-white/60 transition-colors border border-white/50 shadow-sm group"
         >
           <X className="w-5 h-5 text-stone-800 group-hover:rotate-90 transition-transform duration-300" />
@@ -48,8 +78,8 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product, onClos
                {t('product.category.' + product.category) || product.category}
              </span>
           </div>
-          <h2 className="text-3xl md:text-4xl font-serif font-bold text-stone-900 mb-3 tracking-tight">{product.name}</h2>
-          <p className="text-2xl font-medium text-stone-800 mb-8">${product.price}.00</p>
+          <h2 id="modal-title" className="text-3xl md:text-4xl font-serif font-bold text-stone-900 mb-3 tracking-tight">{product.name}</h2>
+          <p className="text-2xl font-medium text-stone-800 mb-8">{formatPrice(currentPrice, currentPrice)}</p>
 
           {/* iOS Segmented Control Style Tabs */}
           <div className="flex p-1 bg-stone-200/50 rounded-xl mb-8 backdrop-blur-sm">
@@ -83,25 +113,40 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product, onClos
               </div>
             )}
             {activeTab === 'details' && (
-              <div className="space-y-4 text-sm text-stone-600 animate-fade-in">
-                <div className="flex justify-between border-b border-stone-900/5 pb-3">
-                  <span className="font-semibold text-stone-800">{t('product.burnTime')}</span>
-                  <span>{t('product.burnTimeValue')}</span>
+              <div className="space-y-6 text-sm text-stone-600 animate-fade-in">
+                <div className="space-y-4">
+                    <div className="flex justify-between border-b border-stone-900/5 pb-3">
+                    <span className="font-semibold text-stone-800">{t('product.burnTime')}</span>
+                    <span>{t('product.burnTimeValue')}</span>
+                    </div>
+                    <div className="flex justify-between border-b border-stone-900/5 pb-3">
+                    <span className="font-semibold text-stone-800">{t('product.weight')}</span>
+                    <span>{t('product.weightValue')}</span>
+                    </div>
+                    <div className="pt-2">
+                    <span className="font-semibold text-stone-800 block mb-2">{t('product.ingredients')}</span>
+                    <span className="text-stone-500 leading-relaxed">{t('product.ingredientsValue')}</span>
+                    </div>
                 </div>
-                <div className="flex justify-between border-b border-stone-900/5 pb-3">
-                  <span className="font-semibold text-stone-800">{t('product.weight')}</span>
-                  <span>{t('product.weightValue')}</span>
-                </div>
-                <div className="pt-2">
-                  <span className="font-semibold text-stone-800 block mb-2">{t('product.ingredients')}</span>
-                  <span className="text-stone-500 leading-relaxed">{t('product.ingredientsValue')}</span>
+                
+                {/* Care Instructions */}
+                <div className="bg-stone-50/50 p-4 rounded-2xl border border-stone-100">
+                    <span className="font-semibold text-stone-800 block mb-2 text-xs uppercase tracking-wide">{t('product.care')}</span>
+                    <p className="leading-relaxed text-stone-500">{t('product.careValue')}</p>
                 </div>
               </div>
             )}
             {activeTab === 'shipping' && (
-              <div className="text-sm text-stone-600 animate-fade-in bg-white/40 p-4 rounded-2xl border border-white/50">
-                 <p className="mb-3 font-medium">{t('product.shippingValue')}</p>
-                 <p className="italic text-stone-400 text-xs">Returns accepted within 30 days of purchase.</p>
+              <div className="text-sm text-stone-600 animate-fade-in space-y-4">
+                 <div className="bg-white/40 p-4 rounded-2xl border border-white/50">
+                    <p className="font-medium text-stone-800 mb-2">{t('product.tab.shipping')}</p>
+                    <p className="leading-relaxed">{t('product.shippingValue')}</p>
+                 </div>
+                 
+                 <div className="px-2">
+                    <p className="font-semibold text-stone-800 mb-1 text-xs uppercase tracking-wide">{t('product.returnsPolicy')}</p>
+                    <p className="text-stone-500 leading-relaxed">{t('product.returnsValue')}</p>
+                 </div>
               </div>
             )}
           </div>
@@ -113,6 +158,7 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product, onClos
                 <button 
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
                   className="w-12 h-12 flex items-center justify-center hover:bg-white/80 transition-colors rounded-l-full"
+                  aria-label="Decrease quantity"
                 >
                   <Minus className="w-4 h-4 text-stone-600" />
                 </button>
@@ -120,13 +166,32 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product, onClos
                 <button 
                   onClick={() => setQuantity(quantity + 1)}
                   className="w-12 h-12 flex items-center justify-center hover:bg-white/80 transition-colors rounded-r-full"
+                  aria-label="Increase quantity"
                 >
                   <Plus className="w-4 h-4 text-stone-600" />
                 </button>
               </div>
-              <button className="flex-1 bg-stone-900 text-white font-bold tracking-wide flex items-center justify-center gap-3 hover:bg-stone-800 transition-all duration-300 rounded-full shadow-lg hover:shadow-stone-900/20 active:scale-95">
-                <ShoppingBag className="w-5 h-5" />
-                <span>{t('product.addToCart')} • ${(product.price * quantity).toFixed(2)}</span>
+              <button 
+                onClick={handleAddToCart}
+                disabled={isAdded}
+                className={`flex-1 font-bold tracking-wide flex items-center justify-center gap-3 transition-all duration-300 rounded-full shadow-lg hover:shadow-stone-900/20 active:scale-95 ${
+                    isAdded 
+                    ? 'bg-stone-700 text-white' 
+                    : 'bg-stone-900 text-white hover:bg-stone-800'
+                }`}
+                style={isAdded ? { backgroundColor: '#4A4E69' } : {}}
+              >
+                {isAdded ? (
+                    <>
+                      <Check className="w-5 h-5" />
+                      <span>{t('product.added')}</span>
+                    </>
+                ) : (
+                    <>
+                      <ShoppingBag className="w-5 h-5" />
+                      <span>{t('product.addToCart')} • {formatPrice(totalPrice, totalPrice)}</span>
+                    </>
+                )}
               </button>
             </div>
           </div>

@@ -1,162 +1,203 @@
 import React, { useState } from 'react';
 import { Product } from '../types';
-import { Plus, ArrowRight } from 'lucide-react';
+import { ShoppingBag, Eye, Check } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
+import { useCart } from '../context/CartContext';
 import ProductDetailModal from './ProductDetailModal';
+import { PRODUCTS_EN, PRODUCTS_VI, SeasonalProduct } from '../data/products';
 
-// Extending Product type locally for color property
-interface SeasonalProduct extends Product {
-  colorTheme: string;
-}
-
-const PRODUCTS_EN: SeasonalProduct[] = [
-  {
-    id: '1',
-    name: 'Spring Bud',
-    price: 35,
-    description: 'The touch of morning dew on young buds. A promise of new beginnings.',
-    scentNotes: ['Grapefruit', 'Green Tea', 'Morning Dew'],
-    image: 'https://images.unsplash.com/photo-1612198188060-c7c2a6967efd?q=80&w=1500&auto=format&fit=crop',
-    category: 'signature',
-    colorTheme: 'bg-brand-olive'
-  },
-  {
-    id: '2',
-    name: 'Summer Breeze',
-    price: 35,
-    description: 'Cool sea breeze touching the skin. Salt air and driftwood.',
-    scentNotes: ['Sea Salt', 'Driftwood', 'Sage'],
-    image: 'https://images.unsplash.com/photo-1603006905003-be475563bc59?q=80&w=1500&auto=format&fit=crop',
-    category: 'signature',
-    colorTheme: 'bg-brand-mineral'
-  },
-  {
-    id: '3',
-    name: 'Autumn Sun',
-    price: 35,
-    description: 'Warm sunlight through turning leaves. Spicy and grounding.',
-    scentNotes: ['Cardamom', 'Cedarwood', 'Amber'],
-    image: 'https://images.unsplash.com/photo-1570823635306-250abb06d4b3?q=80&w=1500&auto=format&fit=crop',
-    category: 'signature',
-    colorTheme: 'bg-brand-terracotta'
-  },
-  {
-    id: '4',
-    name: 'Winter Hearth',
-    price: 35,
-    description: 'Warmth from a kitchen corner. Comforting firewood and vanilla.',
-    scentNotes: ['Firewood', 'Vanilla', 'Clove'],
-    image: 'https://images.unsplash.com/photo-1608755717536-faa6a36e817e?q=80&w=1500&auto=format&fit=crop',
-    category: 'signature',
-    colorTheme: 'bg-brand-charcoal'
-  },
-];
-
-const PRODUCTS_VI: SeasonalProduct[] = [
-  {
-    id: '1',
-    name: 'Mầm Xuân',
-    price: 35,
-    description: 'Cảm giác sương sớm chạm lên chồi non. Tươi mới và tinh khôi.',
-    scentNotes: ['Bưởi Hồng', 'Trà Xanh', 'Sương Mai'],
-    image: 'https://images.unsplash.com/photo-1612198188060-c7c2a6967efd?q=80&w=1500&auto=format&fit=crop',
-    category: 'signature',
-    colorTheme: 'bg-brand-olive'
-  },
-  {
-    id: '2',
-    name: 'Gió Hạ',
-    price: 35,
-    description: 'Gió biển mát lành chạm vào da thịt. Muối biển và gỗ trôi.',
-    scentNotes: ['Muối Biển', 'Gỗ Trôi', 'Xô Thơm'],
-    image: 'https://images.unsplash.com/photo-1603006905003-be475563bc59?q=80&w=1500&auto=format&fit=crop',
-    category: 'signature',
-    colorTheme: 'bg-brand-mineral'
-  },
-  {
-    id: '3',
-    name: 'Nắng Thu',
-    price: 35,
-    description: 'Nắng ấm xuyên qua kẽ lá vàng. Trầm ấm và bình yên.',
-    scentNotes: ['Bạch Đậu Khấu', 'Gỗ Tuyết Tùng', 'Hổ Phách'],
-    image: 'https://images.unsplash.com/photo-1570823635306-250abb06d4b3?q=80&w=1500&auto=format&fit=crop',
-    category: 'signature',
-    colorTheme: 'bg-brand-terracotta'
-  },
-  {
-    id: '4',
-    name: 'Lửa Đông',
-    price: 35,
-    description: 'Hơi ấm từ góc bếp nhỏ. Củi khô và vani ngọt ngào.',
-    scentNotes: ['Củi Khô', 'Vani', 'Đinh Hương'],
-    image: 'https://images.unsplash.com/photo-1608755717536-faa6a36e817e?q=80&w=1500&auto=format&fit=crop',
-    category: 'signature',
-    colorTheme: 'bg-brand-charcoal'
-  },
-];
+type FilterType = 'candles' | 'oils' | 'accessories';
+type CollectionType = 'limited' | 'signature';
 
 const ProductGrid: React.FC = () => {
-  const { t, language } = useLanguage();
+  const { t, language, formatPrice } = useLanguage();
+  const { addItem } = useCart();
   const products = language === 'vi' ? PRODUCTS_VI : PRODUCTS_EN;
+  
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [addedProductId, setAddedProductId] = useState<string | null>(null);
+  
+  // Collection Tab State (Top Section)
+  const [activeCollection, setActiveCollection] = useState<CollectionType>('limited');
+  
+  // Shop Essentials Filter State (Bottom Section)
+  const [activeFilter, setActiveFilter] = useState<FilterType>('candles');
 
-  return (
-    <section id="collections" className="py-32 bg-brand-bg relative">
-      <div className="container mx-auto px-6">
-        <div className="flex flex-col items-center text-center mb-20">
-          <h2 className="text-4xl md:text-6xl font-serif text-brand-dark mb-6">{t('products.title')}</h2>
-          <p className="text-stone-600 max-w-xl font-light text-lg">{t('products.subtitle')}</p>
-        </div>
+  const handleAddToCart = (e: React.MouseEvent, product: Product) => {
+    e.stopPropagation();
+    addItem(product);
+    setAddedProductId(product.id);
+    setTimeout(() => {
+      setAddedProductId(null);
+    }, 2000);
+  };
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {products.map((product) => (
-            <div 
-              key={product.id} 
-              className="group cursor-pointer flex flex-col" 
-              onClick={() => setSelectedProduct(product)}
-            >
-              {/* Image Card with Color Theme */}
-              <div className="relative overflow-hidden rounded-t-[2rem] aspect-[3/4] mb-0">
-                 <img 
-                  src={product.image} 
-                  alt={product.name} 
-                  className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors duration-500"></div>
-              </div>
-              
-              {/* Content Card */}
-              <div className={`p-6 rounded-b-[2rem] text-white transition-all duration-500 relative overflow-hidden ${product.colorTheme}`}>
-                <div className="absolute top-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                   <div className="bg-white/20 backdrop-blur-md p-2 rounded-full">
-                     <Plus className="w-4 h-4 text-white" />
-                   </div>
-                </div>
+  // Logic for Top Section (Featured Collections)
+  const showcaseProducts = products.filter(p => p.category === activeCollection);
 
-                <h3 className="text-2xl font-serif mb-2">{product.name}</h3>
-                <div className="w-10 h-0.5 bg-white/40 mb-4"></div>
-                <p className="text-sm text-white/80 mb-4 font-light line-clamp-2 min-h-[2.5em]">
-                  {product.description}
-                </p>
-                <div className="flex justify-between items-end">
-                   <div className="flex gap-2 text-xs opacity-75">
-                      {product.scentNotes.slice(0,2).join(' • ')}
-                   </div>
-                   <span className="text-lg font-medium font-serif">${product.price}</span>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+  // Logic for Bottom Section (Essentials)
+  let essentialProducts: SeasonalProduct[] = [];
+  if (activeFilter === 'candles') {
+     // Show all candles (Signature + Limited + Seasonal)
+     essentialProducts = products.filter(p => p.category === 'signature' || p.category === 'limited' || p.category === 'seasonal');
+  } else if (activeFilter === 'oils') {
+     essentialProducts = products.filter(p => p.category === 'essential_oil');
+  } else if (activeFilter === 'accessories') {
+     essentialProducts = products.filter(p => p.category === 'accessory');
+  }
+
+  const ProductCard = ({ product }: { product: SeasonalProduct }) => (
+    <div 
+      className="group cursor-pointer flex flex-col outline-none animate-fade-in" 
+      onClick={() => setSelectedProduct(product)}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          setSelectedProduct(product);
+        }
+      }}
+    >
+      {/* Image Card - Ultra Clean */}
+      <div className="relative overflow-hidden rounded-[2rem] aspect-[3/4] mb-6 shadow-sm bg-white group-focus:ring-2 group-focus:ring-brand-dark group-focus:ring-offset-4 transition-all">
+          <img 
+          src={product.image} 
+          alt={product.name} 
+          className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
+        />
+        {/* Hover Overlay */}
+        <div className="absolute inset-0 bg-black/5 group-hover:bg-black/0 transition-colors duration-500"></div>
         
-        <div className="mt-20 text-center">
-           <a href="#" className="inline-flex items-center gap-2 text-brand-dark uppercase tracking-widest text-xs font-bold border-b border-brand-dark pb-1 hover:text-brand-terracotta hover:border-brand-terracotta transition-colors">
-             {t('products.viewAll')} <ArrowRight className="w-3 h-3" />
-          </a>
+        {/* Quick Action Buttons - Appear on hover */}
+        <div className="absolute bottom-0 left-0 w-full p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300 flex gap-2">
+           {/* Quick View */}
+           <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setSelectedProduct(product);
+            }}
+            className="flex-1 bg-white/90 backdrop-blur-md text-stone-800 py-3 rounded-full font-medium text-sm hover:bg-white transition-colors shadow-lg flex items-center justify-center gap-2"
+          >
+            <Eye className="w-4 h-4" />
+            {t('product.quickView')}
+          </button>
+
+          {/* Quick Add */}
+          <button
+            onClick={(e) => handleAddToCart(e, product)}
+            disabled={addedProductId === product.id}
+            className={`flex-1 py-3 rounded-full font-medium text-sm transition-all shadow-lg flex items-center justify-center gap-2 ${
+              addedProductId === product.id 
+              ? 'bg-brand-olive text-white' 
+              : 'bg-stone-900 text-white hover:bg-stone-800'
+            }`}
+          >
+            {addedProductId === product.id ? (
+              <Check className="w-4 h-4" />
+            ) : (
+              <ShoppingBag className="w-4 h-4" />
+            )}
+            {addedProductId === product.id ? '' : '+'}
+          </button>
         </div>
       </div>
 
-      {/* Product Detail Modal */}
+      {/* Content */}
+      <div className="text-center space-y-2">
+        <h3 className="font-serif text-xl text-stone-900">{product.name}</h3>
+        <p className="text-stone-500 text-sm line-clamp-1 font-light">{product.description}</p>
+        <div className="pt-2 flex items-center justify-center gap-2">
+           <span className="font-medium text-stone-900">{formatPrice(product.price, product.priceVND)}</span>
+        </div>
+      </div>
+    </div>
+  );
+
+  return (
+    <section id="collections" className="py-24 px-6 bg-stone-50">
+      <div className="container mx-auto">
+        
+        {/* PART 1: FEATURED COLLECTIONS TAB SYSTEM */}
+        <div className="mb-32">
+          <div className="text-center mb-12 animate-fade-in-up">
+            <span className="text-stone-500 text-xs font-bold tracking-[0.25em] uppercase block mb-6">{t('products.section.featured')}</span>
+            
+            {/* Collection Tabs */}
+            <div className="flex justify-center gap-8 mb-10 border-b border-stone-200 pb-4 max-w-2xl mx-auto">
+                <button 
+                    onClick={() => setActiveCollection('limited')}
+                    className={`text-2xl md:text-4xl font-serif transition-colors duration-300 ${activeCollection === 'limited' ? 'text-brand-dark border-b-2 border-brand-dark pb-4 -mb-4.5' : 'text-stone-400 hover:text-stone-600'}`}
+                >
+                    {t('collection.limited.title')}
+                </button>
+                <span className="text-3xl text-stone-300 font-serif italic">&</span>
+                <button 
+                    onClick={() => setActiveCollection('signature')}
+                    className={`text-2xl md:text-4xl font-serif transition-colors duration-300 ${activeCollection === 'signature' ? 'text-brand-dark border-b-2 border-brand-dark pb-4 -mb-4.5' : 'text-stone-400 hover:text-stone-600'}`}
+                >
+                    {t('collection.signature.title')}
+                </button>
+            </div>
+
+            <p className="text-stone-500 max-w-xl mx-auto text-lg font-light min-h-[3.5rem]">
+                {activeCollection === 'limited' ? t('collection.limited.desc') : t('collection.signature.desc')}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 lg:gap-16">
+            {showcaseProducts.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        </div>
+
+        {/* Divider */}
+        <div className="w-full h-px bg-stone-200 mb-24"></div>
+
+        {/* PART 2: SHOP ESSENTIALS (Tabbed) */}
+        <div>
+           <div className="flex flex-col items-center mb-12 animate-fade-in-up">
+            <span className="text-stone-500 text-xs font-bold tracking-[0.25em] uppercase block mb-3">{t('nav.shopAll')}</span>
+            <h2 className="text-3xl md:text-5xl font-serif text-stone-900 mb-10">{t('products.section.main')}</h2>
+            
+            {/* Essential Tabs */}
+            <div className="flex gap-2 p-1 bg-stone-200/50 rounded-full backdrop-blur-sm">
+                <button 
+                    onClick={() => setActiveFilter('candles')}
+                    className={`px-6 py-2 rounded-full text-sm font-bold tracking-wide transition-all ${activeFilter === 'candles' ? 'bg-white shadow-sm text-stone-900' : 'text-stone-500 hover:text-stone-700'}`}
+                >
+                    {t('filter.candles')}
+                </button>
+                <button 
+                    onClick={() => setActiveFilter('oils')}
+                    className={`px-6 py-2 rounded-full text-sm font-bold tracking-wide transition-all ${activeFilter === 'oils' ? 'bg-white shadow-sm text-stone-900' : 'text-stone-500 hover:text-stone-700'}`}
+                >
+                    {t('filter.oils')}
+                </button>
+                 <button 
+                    onClick={() => setActiveFilter('accessories')}
+                    className={`px-6 py-2 rounded-full text-sm font-bold tracking-wide transition-all ${activeFilter === 'accessories' ? 'bg-white shadow-sm text-stone-900' : 'text-stone-500 hover:text-stone-700'}`}
+                >
+                    {t('filter.accessories')}
+                </button>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16">
+            {essentialProducts.length > 0 ? (
+              essentialProducts.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))
+            ) : (
+                <div className="col-span-full text-center py-12 text-stone-400 italic">
+                    No products found in this category.
+                </div>
+            )}
+          </div>
+        </div>
+      </div>
+
       {selectedProduct && (
         <ProductDetailModal 
           product={selectedProduct} 

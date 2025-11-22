@@ -1,50 +1,102 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import ProductGrid from './components/ProductGrid';
 import ScentAI from './components/ScentAI';
 import Footer from './components/Footer';
+import StoryModal from './components/StoryModal';
+import CartDrawer from './components/CartDrawer';
 import { useLanguage } from './context/LanguageContext';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Leaf, Flame, Hand } from 'lucide-react';
 
 function App() {
   const { t } = useLanguage();
+  const [showStoryModal, setShowStoryModal] = useState(false);
 
   return (
     <div className="min-h-screen flex flex-col font-sans bg-brand-bg text-brand-dark">
       <Navbar />
+      <CartDrawer />
       <main className="flex-grow">
         <Hero />
         
-        {/* About Section */}
+        {/* Brand Philosophy Section */}
         <section id="about" className="py-32 px-6 bg-white">
-            <div className="container mx-auto flex flex-col md:flex-row items-center gap-20">
-              <div className="w-full md:w-1/2 relative">
-                <div className="aspect-[4/5] overflow-hidden rounded-[2rem]">
-                   <img 
-                    src="https://images.unsplash.com/photo-1617321290070-8c85676e746b?q=80&w=2000&auto=format&fit=crop" 
-                    alt="Narie lifestyle" 
-                    className="w-full h-full object-cover"
-                  />
+            <div className="container mx-auto">
+              <div className="flex flex-col lg:flex-row items-center gap-20">
+                
+                {/* Aesthetic Image Grid */}
+                <div className="w-full lg:w-1/2 grid grid-cols-2 gap-4">
+                  <div className="space-y-4 mt-12">
+                    <div className="aspect-[3/4] overflow-hidden rounded-2xl">
+                       <img 
+                        src="https://images.unsplash.com/photo-1603006905003-be475563bc59?q=80&w=800&auto=format&fit=crop" 
+                        alt="Natural Soy Wax" 
+                        className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
+                      />
+                    </div>
+                     <div className="aspect-square overflow-hidden rounded-2xl">
+                       <img 
+                        src="https://images.unsplash.com/photo-1608224786204-192c9615790d?q=80&w=800&auto=format&fit=crop" 
+                        alt="Wood Wick detail" 
+                        className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="aspect-square overflow-hidden rounded-2xl">
+                       <img 
+                        src="https://images.unsplash.com/photo-1596433809252-260c2745dfdd?q=80&w=800&auto=format&fit=crop" 
+                        alt="Hand pouring process" 
+                        className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
+                      />
+                    </div>
+                    <div className="aspect-[3/4] overflow-hidden rounded-2xl">
+                       <img 
+                        src="https://images.unsplash.com/photo-1505691938895-1758d7feb511?q=80&w=800&auto=format&fit=crop" 
+                        alt="Minimalist home decor" 
+                        className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
+                      />
+                    </div>
+                  </div>
                 </div>
-                <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-brand-olive/20 rounded-full blur-3xl z-0"></div>
-              </div>
-              
-              <div className="w-full md:w-1/2">
-                <span className="text-brand-terracotta text-sm tracking-[0.2em] uppercase font-bold block mb-6">{t('app.about.title')}</span>
-                <h2 className="text-4xl md:text-5xl font-serif text-brand-dark mb-10 leading-tight">
-                  {t('hero.tagline')}
-                </h2>
-                <p className="text-stone-600 mb-8 leading-relaxed text-lg font-light">
-                  {t('app.about.p1')}
-                </p>
-                <p className="text-stone-600 mb-12 leading-relaxed text-lg font-light">
-                  {t('app.about.p2')}
-                </p>
-                <a href="#" className="group inline-flex items-center gap-3 text-brand-dark font-medium hover:text-brand-terracotta transition-colors">
-                  {t('app.about.cta')}
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </a>
+                
+                {/* Content */}
+                <div className="w-full lg:w-1/2">
+                  <span className="text-brand-terracotta text-xs font-bold tracking-[0.25em] uppercase block mb-6 pl-1">
+                    {t('app.about.title')}
+                  </span>
+                  <h2 className="text-4xl md:text-5xl lg:text-6xl font-serif text-brand-dark mb-10 leading-tight">
+                    {t('app.about.heading')}
+                  </h2>
+                  <p className="text-stone-600 mb-8 leading-relaxed text-lg font-light">
+                    {t('app.about.p1')}
+                  </p>
+                  
+                  {/* Features List */}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-12 border-t border-b border-stone-100 py-8">
+                    <div className="flex flex-col gap-3">
+                      <Leaf className="w-6 h-6 text-brand-olive" />
+                      <h4 className="font-serif text-lg">{t('app.feat.safe')}</h4>
+                    </div>
+                    <div className="flex flex-col gap-3">
+                      <Flame className="w-6 h-6 text-brand-terracotta" />
+                      <h4 className="font-serif text-lg">{t('app.feat.wood')}</h4>
+                    </div>
+                    <div className="flex flex-col gap-3">
+                      <Hand className="w-6 h-6 text-brand-mineral" />
+                      <h4 className="font-serif text-lg">{t('app.feat.hand')}</h4>
+                    </div>
+                  </div>
+
+                  <button 
+                    onClick={() => setShowStoryModal(true)}
+                    className="group inline-flex items-center gap-3 text-brand-dark font-medium hover:text-brand-terracotta transition-colors tracking-wide"
+                  >
+                    {t('app.about.cta')}
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </button>
+                </div>
               </div>
             </div>
         </section>
@@ -53,59 +105,22 @@ function App() {
         
         <ScentAI />
 
-        {/* Blog / Lifestyle Section: Healing Corner */}
-        <section className="py-32 px-6 bg-brand-bg">
-          <div className="container mx-auto">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl font-serif text-brand-dark mb-4">{t('blog.title')}</h2>
-              <p className="text-stone-500 font-light">{t('blog.subtitle')}</p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {/* Article 1 */}
-              <div className="group cursor-pointer">
-                <div className="aspect-[3/2] overflow-hidden rounded-2xl mb-6">
-                  <img src="https://images.unsplash.com/photo-1491926626787-62db157af940?q=80&w=1500&auto=format&fit=crop" alt="Balcony" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
-                </div>
-                <h3 className="text-2xl font-serif mb-3 group-hover:text-brand-terracotta transition-colors">{t('blog.p1.title')}</h3>
-                <p className="text-stone-600 font-light leading-relaxed">{t('blog.p1.desc')}</p>
-              </div>
-
-              {/* Article 2 */}
-              <div className="group cursor-pointer">
-                <div className="aspect-[3/2] overflow-hidden rounded-2xl mb-6">
-                  <img src="https://images.unsplash.com/photo-1516967865013-50a328285252?q=80&w=1500&auto=format&fit=crop" alt="Evening" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
-                </div>
-                <h3 className="text-2xl font-serif mb-3 group-hover:text-brand-mineral transition-colors">{t('blog.p2.title')}</h3>
-                <p className="text-stone-600 font-light leading-relaxed">{t('blog.p2.desc')}</p>
-              </div>
-
-               {/* Article 3 */}
-               <div className="group cursor-pointer">
-                <div className="aspect-[3/2] overflow-hidden rounded-2xl mb-6">
-                  <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?q=80&w=1500&auto=format&fit=crop" alt="Community" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
-                </div>
-                <h3 className="text-2xl font-serif mb-3 group-hover:text-brand-olive transition-colors">{t('blog.p3.title')}</h3>
-                <p className="text-stone-600 font-light leading-relaxed">{t('blog.p3.desc')}</p>
-              </div>
-            </div>
-          </div>
-        </section>
-
         {/* Director's Note */}
         <section className="py-24 bg-white border-t border-stone-100">
           <div className="container mx-auto px-6 max-w-4xl text-center">
-            <h3 className="text-sm font-bold uppercase tracking-[0.2em] text-brand-terracotta mb-8">{t('director.title')}</h3>
-            <p className="text-2xl md:text-3xl font-serif italic text-brand-dark leading-relaxed mb-10">
+            <h3 className="text-xs font-bold uppercase tracking-[0.25em] text-brand-terracotta mb-8">{t('director.title')}</h3>
+            <p className="text-2xl md:text-4xl font-serif italic text-brand-dark leading-relaxed mb-10 opacity-80">
               "{t('director.text')}"
             </p>
-            <div className="w-16 h-0.5 bg-brand-dark mx-auto mb-6"></div>
-            <p className="text-sm font-medium text-brand-dark">{t('director.signoff')}</p>
+            <div className="w-24 h-px bg-brand-dark/20 mx-auto mb-6"></div>
+            <p className="text-sm font-bold text-brand-dark tracking-wider">{t('director.signoff')}</p>
           </div>
         </section>
 
       </main>
       <Footer />
+
+      {showStoryModal && <StoryModal onClose={() => setShowStoryModal(false)} />}
     </div>
   );
 }
