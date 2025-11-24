@@ -1,17 +1,20 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Product } from '../types';
 
+export type ProductVariant = 'standard' | 'gift';
+
 interface CartItem {
   product: Product;
   quantity: number;
+  variant: ProductVariant;
 }
 
 interface CartContextType {
   items: CartItem[];
   isOpen: boolean;
-  addItem: (product: Product, quantity?: number) => void;
-  removeItem: (productId: string) => void;
-  updateQuantity: (productId: string, quantity: number) => void;
+  addItem: (product: Product, quantity?: number, variant?: ProductVariant) => void;
+  removeItem: (productId: string, variant: ProductVariant) => void;
+  updateQuantity: (productId: string, variant: ProductVariant, quantity: number) => void;
   clearCart: () => void;
   toggleCart: () => void;
   totalItems: number;
@@ -23,33 +26,32 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [items, setItems] = useState<CartItem[]>([]);
   const [isOpen, setIsOpen] = useState(false);
 
-  const addItem = (product: Product, quantity: number = 1) => {
+  const addItem = (product: Product, quantity: number = 1, variant: ProductVariant = 'standard') => {
     setItems(prev => {
-      const existingItem = prev.find(item => item.product.id === product.id);
+      const existingItem = prev.find(item => item.product.id === product.id && item.variant === variant);
       if (existingItem) {
         return prev.map(item => 
-          item.product.id === product.id 
+          (item.product.id === product.id && item.variant === variant)
             ? { ...item, quantity: item.quantity + quantity } 
             : item
         );
       }
-      return [...prev, { product, quantity }];
+      return [...prev, { product, quantity, variant }];
     });
-    // Removed setIsOpen(true) to prevent auto-opening the drawer
   };
 
-  const removeItem = (productId: string) => {
-    setItems(prev => prev.filter(item => item.product.id !== productId));
+  const removeItem = (productId: string, variant: ProductVariant) => {
+    setItems(prev => prev.filter(item => !(item.product.id === productId && item.variant === variant)));
   };
 
-  const updateQuantity = (productId: string, quantity: number) => {
+  const updateQuantity = (productId: string, variant: ProductVariant, quantity: number) => {
     if (quantity < 1) {
-      removeItem(productId);
+      removeItem(productId, variant);
       return;
     }
     setItems(prev => 
       prev.map(item => 
-        item.product.id === productId 
+        (item.product.id === productId && item.variant === variant)
           ? { ...item, quantity } 
           : item
       )

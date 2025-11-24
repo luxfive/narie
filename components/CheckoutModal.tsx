@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, CheckCircle, CreditCard, Truck, ArrowRight, ChevronLeft, QrCode } from 'lucide-react';
+import { X, CheckCircle, CreditCard, Truck, ArrowRight, ChevronLeft, QrCode, Gift } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useLanguage } from '../context/LanguageContext';
 
@@ -17,10 +17,16 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose }) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('cod');
 
+   // Helper to calculate price with variant fee
+   const calculateItemPrice = (item: typeof items[0]) => {
+    const basePrice = currency === 'USD' ? item.product.price : item.product.priceVND;
+    const giftFee = item.variant === 'gift' ? (currency === 'USD' ? 5 : 100000) : 0;
+    return basePrice + giftFee;
+   };
+
   // 1. Calculate Subtotal
   const subtotal = items.reduce((acc, item) => {
-    const price = currency === 'USD' ? item.product.price : item.product.priceVND;
-    return acc + (price * item.quantity);
+    return acc + (calculateItemPrice(item) * item.quantity);
   }, 0);
 
   // 2. Calculate Shipping
@@ -307,19 +313,25 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose }) => {
               <h3 className="font-serif font-bold text-xl mb-6 text-stone-900">{t('checkout.summary')}</h3>
               
               <div className="flex-1 overflow-y-auto space-y-4 mb-6 pr-2 custom-scrollbar max-h-[50vh] md:max-h-none">
-                {items.map(({ product, quantity }) => (
-                  <div key={product.id} className="flex gap-4">
+                {items.map(({ product, quantity, variant }) => (
+                  <div key={`${product.id}-${variant}`} className="flex gap-4">
                     <div className="w-16 h-16 rounded-md overflow-hidden bg-white border border-stone-200 flex-shrink-0">
                       <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
                     </div>
                     <div className="flex-1">
                       <p className="font-medium text-sm text-stone-900">{product.name}</p>
                       <p className="text-xs text-stone-500">Qty: {quantity}</p>
+                      {variant === 'gift' && (
+                         <span className="flex items-center gap-1 text-[10px] text-stone-800 bg-stone-200 px-2 py-0.5 rounded-full mt-1 w-fit">
+                            <Gift className="w-3 h-3" />
+                            {t('product.option.gift')}
+                         </span>
+                      )}
                     </div>
                     <p className="font-medium text-sm text-stone-900">
                       {formatPrice(
-                        (currency === 'USD' ? product.price : product.priceVND) * quantity,
-                        (currency === 'USD' ? product.price : product.priceVND) * quantity
+                        calculateItemPrice({ product, quantity, variant }) * quantity,
+                        calculateItemPrice({ product, quantity, variant }) * quantity
                       )}
                     </p>
                   </div>

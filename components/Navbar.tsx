@@ -58,16 +58,16 @@ const Navbar: React.FC = () => {
         {/* Desktop Menu - Programmatic Scroll */}
         <div className={`hidden md:flex items-center gap-8 text-sm font-medium tracking-wide transition-colors ${isScrolled ? 'text-stone-800' : 'text-stone-700'}`}>
           <a 
-            href="#collections" 
-            onClick={(e) => scrollToSection(e, 'collections')}
+            href="#shop-all" 
+            onClick={(e) => scrollToSection(e, 'shop-all')}
             className="hover:text-amber-900 transition-colors relative group cursor-pointer"
           >
             {t('nav.shop')}
             <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-amber-900 transition-all duration-300 group-hover:w-full"></span>
           </a>
           <a 
-            href="#collections" 
-            onClick={(e) => scrollToSection(e, 'collections')}
+            href="#featured-collection" 
+            onClick={(e) => scrollToSection(e, 'featured-collection')}
             className="hover:text-amber-900 transition-colors relative group cursor-pointer"
           >
             {t('nav.collections')}
@@ -136,15 +136,15 @@ const Navbar: React.FC = () => {
       {isMobileMenuOpen && (
         <div className="md:hidden absolute top-full left-0 w-full bg-stone-50/95 backdrop-blur-xl border-b border-stone-200 shadow-lg py-8 px-6 flex flex-col gap-6 text-center animate-fade-in h-screen">
           <a 
-            href="#collections" 
-            onClick={(e) => scrollToSection(e, 'collections')} 
+            href="#shop-all" 
+            onClick={(e) => scrollToSection(e, 'shop-all')} 
             className="text-stone-800 font-medium hover:text-amber-900 cursor-pointer text-xl"
           >
             {t('nav.shop')}
           </a>
           <a 
-            href="#collections" 
-            onClick={(e) => scrollToSection(e, 'collections')} 
+            href="#featured-collection" 
+            onClick={(e) => scrollToSection(e, 'featured-collection')} 
             className="text-stone-800 font-medium hover:text-amber-900 cursor-pointer text-xl"
           >
             {t('nav.collections')}

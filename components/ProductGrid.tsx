@@ -46,7 +46,7 @@ const ProductGrid: React.FC = () => {
      essentialProducts = products.filter(p => p.category === 'accessory');
   }
 
-  const ProductCard = ({ product }: { product: SeasonalProduct }) => (
+  const ProductCard: React.FC<{ product: SeasonalProduct }> = ({ product }) => (
     <div 
       className="group cursor-pointer flex flex-col outline-none animate-fade-in" 
       onClick={() => setSelectedProduct(product)}
@@ -119,7 +119,7 @@ const ProductGrid: React.FC = () => {
       <div className="container mx-auto">
         
         {/* PART 1: FEATURED COLLECTIONS TAB SYSTEM */}
-        <div className="mb-32">
+        <div id="featured-collection" className="mb-32 scroll-mt-28">
           <div className="text-center mb-12 animate-fade-in-up">
             <span className="text-stone-500 text-xs font-bold tracking-[0.25em] uppercase block mb-6">{t('products.section.featured')}</span>
             
@@ -156,7 +156,7 @@ const ProductGrid: React.FC = () => {
         <div className="w-full h-px bg-stone-200 mb-24"></div>
 
         {/* PART 2: SHOP ESSENTIALS (Tabbed) */}
-        <div>
+        <div id="shop-all" className="scroll-mt-28">
            <div className="flex flex-col items-center mb-12 animate-fade-in-up">
             <span className="text-stone-500 text-xs font-bold tracking-[0.25em] uppercase block mb-3">{t('nav.shopAll')}</span>
             <h2 className="text-3xl md:text-5xl font-serif text-stone-900 mb-10">{t('products.section.main')}</h2>

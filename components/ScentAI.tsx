@@ -7,6 +7,36 @@ import { PRODUCTS_EN, PRODUCTS_VI } from '../data/products';
 import { useCart } from '../context/CartContext';
 import ProductDetailModal from './ProductDetailModal';
 
+// Custom Mascot Component: "Bé Nari" - A cute flame with smiling eyes
+const CuteMascot = ({ className }: { className?: string }) => (
+  <svg 
+    viewBox="0 0 24 24" 
+    className={className}
+    fill="none" 
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    {/* Flame Body - Filled with current text color (usually Amber) */}
+    <path 
+      d="M12 2C12 2 4 10 4 16C4 20.4 7.6 24 12 24C16.4 24 20 20.4 20 16C20 10 12 2 12 2Z" 
+      fill="currentColor" 
+    />
+    
+    {/* Face Features - Using a dark tone to contrast with the light flame body */}
+    <g transform="translate(0, 1)">
+      {/* Smiling Eyes (Arc shape) */}
+      <path d="M8.5 15C8.5 15 9 14.5 9.5 15" stroke="#4A3525" strokeWidth="1.5" strokeLinecap="round" />
+      <path d="M14.5 15C14.5 15 15 14.5 15.5 15" stroke="#4A3525" strokeWidth="1.5" strokeLinecap="round" />
+      
+      {/* Smile */}
+      <path d="M10 17.5C10 17.5 11 18.5 12 18.5C13 18.5 14 17.5 14 17.5" stroke="#4A3525" strokeWidth="1.5" strokeLinecap="round" />
+      
+      {/* Blush Cheeks */}
+      <circle cx="7.5" cy="16.5" r="1" fill="#E29578" opacity="0.6" />
+      <circle cx="16.5" cy="16.5" r="1" fill="#E29578" opacity="0.6" />
+    </g>
+  </svg>
+);
+
 const ScentAI: React.FC = () => {
   const [mood, setMood] = useState('');
   const [status, setStatus] = useState<LoadingState>(LoadingState.IDLE);
@@ -74,7 +104,7 @@ const ScentAI: React.FC = () => {
           {/* Left Side: Input */}
           <div className="w-full lg:w-1/2 relative">
             <div className="flex items-center gap-2 text-amber-200 mb-4">
-              <Sparkles className="w-5 h-5" />
+              <CuteMascot className="w-8 h-8" />
               <span className="uppercase tracking-widest text-sm font-medium">{t('ai.tagline')}</span>
             </div>
             <h2 className="text-4xl md:text-5xl font-serif font-bold mb-6 leading-tight bg-clip-text text-transparent bg-gradient-to-r from-stone-100 to-stone-400">
@@ -220,8 +250,9 @@ const ScentAI: React.FC = () => {
             ) : (
               // Empty State / Placeholder with Glass Effect
               <div className={`w-full max-w-md aspect-square border border-white/5 bg-stone-800/20 backdrop-blur-sm rounded-3xl flex flex-col items-center justify-center text-stone-600 transition-all duration-500 ${status === LoadingState.LOADING ? 'opacity-50 scale-95' : 'opacity-100 hover:bg-stone-800/30'}`}>
-                <div className="w-24 h-24 rounded-full bg-gradient-to-br from-stone-700/20 to-stone-800/20 flex items-center justify-center mb-6 shadow-inner border border-white/5">
-                   <Wind className="w-10 h-10 opacity-30" />
+                <div className="w-24 h-24 rounded-full bg-gradient-to-br from-stone-700/20 to-stone-800/20 flex items-center justify-center mb-6 shadow-inner border border-white/5 relative">
+                   {/* Cute Mascot Placeholder */}
+                   <CuteMascot className="w-14 h-14 text-stone-500/50" />
                 </div>
                 <p className="text-lg font-serif opacity-50 tracking-wide">{t('ai.empty.text')}</p>
               </div>

@@ -1,5 +1,5 @@
-import React from 'react';
-import { Flame, Instagram, Twitter, Facebook, MapPin, Mail, Phone, AtSign } from 'lucide-react';
+import React, { useState } from 'react';
+import { Flame, Instagram, Twitter, Facebook, MapPin, Mail, Phone, AtSign, Loader2, Check } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 
 // Custom TikTok Icon since it might not be available in all Lucide versions
@@ -20,8 +20,14 @@ const TiktokIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
-const Footer: React.FC = () => {
+interface FooterProps {
+  onOpenLegal: (type: 'privacy' | 'terms') => void;
+}
+
+const Footer: React.FC<FooterProps> = ({ onOpenLegal }) => {
   const { t } = useLanguage();
+  const [email, setEmail] = useState('');
+  const [subStatus, setSubStatus] = useState<'idle' | 'loading' | 'success'>('idle');
   
   const scrollToSection = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
     e.preventDefault();
@@ -29,6 +35,24 @@ const Footer: React.FC = () => {
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
     }
+  };
+
+  const handleSubscribe = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email || subStatus !== 'idle') return;
+
+    setSubStatus('loading');
+    
+    // Simulate API call
+    setTimeout(() => {
+      setSubStatus('success');
+      setEmail('');
+      
+      // Reset after 3 seconds
+      setTimeout(() => {
+        setSubStatus('idle');
+      }, 3000);
+    }, 1500);
   };
 
   return (
@@ -80,14 +104,35 @@ const Footer: React.FC = () => {
           <div>
             <h4 className="text-white font-medium mb-6">{t('footer.newsletter')}</h4>
             <p className="text-sm mb-4">{t('footer.newsletter_desc')}</p>
-            <form className="flex flex-col gap-3">
+            <form onSubmit={handleSubscribe} className="flex flex-col gap-3">
               <input 
                 type="email" 
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 placeholder="email@example.com" 
-                className="bg-stone-800 border border-stone-700 p-3 text-white focus:outline-none focus:border-stone-500"
+                disabled={subStatus !== 'idle'}
+                required
+                className="bg-stone-800 border border-stone-700 p-3 text-white focus:outline-none focus:border-stone-500 disabled:opacity-50 transition-colors"
               />
-              <button className="bg-stone-100 text-stone-900 py-3 font-medium hover:bg-white transition-colors">
-                {t('footer.subscribe')}
+              <button 
+                type="submit"
+                disabled={subStatus !== 'idle'}
+                className={`py-3 font-medium transition-all duration-300 flex items-center justify-center gap-2 ${
+                  subStatus === 'success' 
+                    ? 'bg-green-700 text-white hover:bg-green-600' 
+                    : 'bg-stone-100 text-stone-900 hover:bg-white'
+                }`}
+              >
+                {subStatus === 'loading' && <Loader2 className="w-4 h-4 animate-spin" />}
+                {subStatus === 'success' && <Check className="w-4 h-4" />}
+                <span>
+                  {subStatus === 'loading' 
+                    ? t('footer.subscribing') 
+                    : subStatus === 'success' 
+                      ? t('footer.subscribe_success') 
+                      : t('footer.subscribe')
+                  }
+                </span>
               </button>
             </form>
           </div>
@@ -96,8 +141,8 @@ const Footer: React.FC = () => {
         <div className="border-t border-stone-800 pt-8 text-xs flex flex-col md:flex-row justify-between items-center gap-4">
           <p>&copy; 2025 Narie Lab Co. {t('footer.rights')}</p>
           <div className="flex gap-6">
-            <a href="#" className="hover:text-white">{t('footer.links.privacy')}</a>
-            <a href="#" className="hover:text-white">{t('footer.links.terms')}</a>
+            <button onClick={() => onOpenLegal('privacy')} className="hover:text-white transition-colors">{t('footer.links.privacy')}</button>
+            <button onClick={() => onOpenLegal('terms')} className="hover:text-white transition-colors">{t('footer.links.terms')}</button>
           </div>
         </div>
       </div>

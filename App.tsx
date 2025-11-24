@@ -6,12 +6,14 @@ import ScentAI from './components/ScentAI';
 import Footer from './components/Footer';
 import StoryModal from './components/StoryModal';
 import CartDrawer from './components/CartDrawer';
+import LegalModal from './components/LegalModal';
 import { useLanguage } from './context/LanguageContext';
 import { ArrowRight, Leaf, Flame, Hand } from 'lucide-react';
 
 function App() {
   const { t } = useLanguage();
   const [showStoryModal, setShowStoryModal] = useState(false);
+  const [activeLegalModal, setActiveLegalModal] = useState<'privacy' | 'terms' | null>(null);
 
   return (
     <div className="min-h-screen flex flex-col font-sans bg-brand-bg text-brand-dark">
@@ -118,9 +120,10 @@ function App() {
         </section>
 
       </main>
-      <Footer />
+      <Footer onOpenLegal={setActiveLegalModal} />
 
       {showStoryModal && <StoryModal onClose={() => setShowStoryModal(false)} />}
+      {activeLegalModal && <LegalModal type={activeLegalModal} onClose={() => setActiveLegalModal(null)} />}
     </div>
   );
 }

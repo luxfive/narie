@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Minus, Plus, ShoppingBag, Trash2 } from 'lucide-react';
+import { X, Minus, Plus, ShoppingBag, Trash2, Gift } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useLanguage } from '../context/LanguageContext';
 import CheckoutModal from './CheckoutModal';
@@ -12,14 +12,18 @@ const CartDrawer: React.FC = () => {
   // If both drawer and checkout are closed, render nothing.
   if (!isOpen && !showCheckout) return null;
 
-  // Calculate Subtotal
+  // Calculate Subtotal with Variants
+  const calculateItemPrice = (item: typeof items[0]) => {
+     const basePrice = currency === 'USD' ? item.product.price : item.product.priceVND;
+     const giftFee = item.variant === 'gift' ? (currency === 'USD' ? 5 : 100000) : 0;
+     return basePrice + giftFee;
+  };
+
   const subtotal = items.reduce((acc, item) => {
-    const price = currency === 'USD' ? item.product.price : item.product.priceVND;
-    return acc + (price * item.quantity);
+    return acc + (calculateItemPrice(item) * item.quantity);
   }, 0);
 
   // Shipping Logic
-  // Threshold: $50 or 1.000.000 VND
   const freeShippingThreshold = currency === 'USD' ? 50 : 1000000;
   const shippingCost = subtotal >= freeShippingThreshold ? 0 : (currency === 'USD' ? 5 : 35000);
   
@@ -73,8 +77,8 @@ const CartDrawer: React.FC = () => {
                   </button>
                 </div>
               ) : (
-                items.map(({ product, quantity }) => (
-                  <div key={product.id} className="flex gap-4 group">
+                items.map(({ product, quantity, variant }) => (
+                  <div key={`${product.id}-${variant}`} className="flex gap-4 group">
                     <div className="w-20 h-20 rounded-lg overflow-hidden bg-stone-100 flex-shrink-0">
                       <img 
                         src={product.image} 
@@ -87,9 +91,15 @@ const CartDrawer: React.FC = () => {
                         <div>
                           <h3 className="font-serif font-medium text-stone-900">{product.name}</h3>
                           <p className="text-xs text-stone-500">{t('product.category.' + product.category)}</p>
+                          {variant === 'gift' && (
+                            <span className="flex items-center gap-1 text-[10px] text-stone-800 bg-stone-100 px-2 py-0.5 rounded-full mt-1 w-fit">
+                              <Gift className="w-3 h-3" />
+                              {t('product.option.gift')}
+                            </span>
+                          )}
                         </div>
                         <button 
-                          onClick={() => removeItem(product.id)}
+                          onClick={() => removeItem(product.id, variant)}
                           className="text-stone-400 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -99,25 +109,27 @@ const CartDrawer: React.FC = () => {
                       <div className="flex justify-between items-end mt-2">
                         <div className="flex items-center border border-stone-200 rounded-full px-2 py-1">
                           <button 
-                            onClick={() => updateQuantity(product.id, quantity - 1)}
+                            onClick={() => updateQuantity(product.id, variant, quantity - 1)}
                             className="p-1 hover:bg-stone-100 rounded-full"
                           >
                             <Minus className="w-3 h-3 text-stone-600" />
                           </button>
                           <span className="w-8 text-center text-xs font-medium">{quantity}</span>
                           <button 
-                            onClick={() => updateQuantity(product.id, quantity + 1)}
+                            onClick={() => updateQuantity(product.id, variant, quantity + 1)}
                             className="p-1 hover:bg-stone-100 rounded-full"
                           >
                             <Plus className="w-3 h-3 text-stone-600" />
                           </button>
                         </div>
-                        <p className="font-medium text-stone-900 text-sm">
-                          {formatPrice(
-                            (currency === 'USD' ? product.price : product.priceVND) * quantity, 
-                            (currency === 'USD' ? product.price : product.priceVND) * quantity
-                          ).replace('₫', '') + (currency === 'VND' ? '₫' : '')}
-                        </p>
+                        <div className="text-right">
+                             <p className="font-medium text-stone-900 text-sm">
+                            {formatPrice(
+                                calculateItemPrice({ product, quantity, variant }) * quantity, 
+                                calculateItemPrice({ product, quantity, variant }) * quantity
+                            ).replace('₫', '') + (currency === 'VND' ? '₫' : '')}
+                            </p>
+                        </div>
                       </div>
                     </div>
                   </div>

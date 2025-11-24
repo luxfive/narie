@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { X, Minus, Plus, ShoppingBag, Check } from 'lucide-react';
+import { X, Minus, Plus, ShoppingBag, Check, Gift, Package } from 'lucide-react';
 import { Product } from '../types';
 import { useLanguage } from '../context/LanguageContext';
-import { useCart } from '../context/CartContext';
+import { useCart, ProductVariant } from '../context/CartContext';
 
 interface ProductDetailModalProps {
   product: Product;
@@ -14,6 +14,7 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product, onClos
   const { addItem } = useCart();
   const [activeTab, setActiveTab] = useState<'description' | 'details' | 'shipping'>('description');
   const [quantity, setQuantity] = useState(1);
+  const [variant, setVariant] = useState<ProductVariant>('standard');
   const [isAdded, setIsAdded] = useState(false);
 
   // Close on Escape key
@@ -26,7 +27,7 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product, onClos
   }, [onClose]);
 
   const handleAddToCart = () => {
-    addItem(product, quantity);
+    addItem(product, quantity, variant);
     
     setIsAdded(true);
     setTimeout(() => {
@@ -36,8 +37,19 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product, onClos
 
   if (!product) return null;
 
-  const currentPrice = currency === 'USD' ? product.price : product.priceVND;
+  // Calculate Price with Variant
+  // Gift Fee: $5 or 100,000 VND
+  const giftFeeUSD = 5;
+  const giftFeeVND = 100000;
+
+  const basePrice = currency === 'USD' ? product.price : product.priceVND;
+  const variantFee = variant === 'gift' ? (currency === 'USD' ? giftFeeUSD : giftFeeVND) : 0;
+  
+  const currentPrice = basePrice + variantFee;
   const totalPrice = currentPrice * quantity;
+
+  // Only candles support gift wrapping usually
+  const supportsGiftWrap = product.category === 'signature' || product.category === 'limited' || product.category === 'seasonal';
 
   return (
     <div 
@@ -99,7 +111,7 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product, onClos
           </div>
 
           {/* Tab Content */}
-          <div className="mb-8 flex-grow min-h-[120px]">
+          <div className="mb-8 flex-grow min-h-[100px]">
             {activeTab === 'description' && (
               <div className="animate-fade-in">
                 <p className="text-stone-600 leading-relaxed mb-6 text-lg font-light">{product.description}</p>
@@ -150,6 +162,30 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product, onClos
               </div>
             )}
           </div>
+
+          {/* Variant Selection (Gift vs Standard) */}
+          {supportsGiftWrap && (
+            <div className="mb-6">
+               <p className="text-xs font-bold uppercase tracking-wider text-stone-500 mb-3">{t('product.option.title')}</p>
+               <div className="grid grid-cols-2 gap-3">
+                 <button 
+                  onClick={() => setVariant('standard')}
+                  className={`p-3 rounded-xl border text-sm flex flex-col items-center justify-center gap-2 transition-all ${variant === 'standard' ? 'border-stone-900 bg-white shadow-md ring-1 ring-stone-900' : 'border-stone-200 bg-white/40 hover:bg-white/80'}`}
+                 >
+                   <Package className={`w-5 h-5 ${variant === 'standard' ? 'text-stone-900' : 'text-stone-400'}`} />
+                   <span className="font-medium">{t('product.option.standard')}</span>
+                 </button>
+                 
+                 <button 
+                  onClick={() => setVariant('gift')}
+                  className={`p-3 rounded-xl border text-sm flex flex-col items-center justify-center gap-2 transition-all ${variant === 'gift' ? 'border-stone-900 bg-white shadow-md ring-1 ring-stone-900' : 'border-stone-200 bg-white/40 hover:bg-white/80'}`}
+                 >
+                   <Gift className={`w-5 h-5 ${variant === 'gift' ? 'text-stone-900' : 'text-stone-400'}`} />
+                   <span className="font-medium">{t('product.option.gift')}</span>
+                 </button>
+               </div>
+            </div>
+          )}
 
           {/* Actions */}
           <div className="mt-auto pt-6 border-t border-stone-900/5">

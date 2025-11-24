@@ -17,7 +17,7 @@ const translations = {
   en: {
     'nav.shop': 'SHOP',
     'nav.collections': 'SEASONS',
-    'nav.ai': 'SCENT AI',
+    'nav.ai': 'LITTLE RI',
     'nav.story': 'PHILOSOPHY',
     'nav.login': 'LOGIN',
     'nav.shopAll': 'SHOP ALL',
@@ -25,7 +25,7 @@ const translations = {
     'hero.title': 'Elevate your living space with exquisite, original scents.',
     'hero.subtitle': 'Hand-poured with natural soy wax and wooden wicks. A healing experience for your home.',
     'hero.cta_shop': 'Explore Collection',
-    'hero.cta_ai': 'Ask Scent AI',
+    'hero.cta_ai': 'Ask Little Ri',
     'app.about.title': 'ABOUT NARIE',
     'app.about.heading': 'More than a candle, a healing lifestyle.',
     'app.about.p1': 'At Narie, we believe that a scent is not just a fragrance, but a memory, a feeling, and a way to heal the soul. Our candles are crafted with the utmost care, using only the finest sustainable ingredients.',
@@ -59,6 +59,9 @@ const translations = {
     'product.shippingValue': 'Free standard shipping on all orders over $50 / 1.000.000₫. Estimated delivery 3-5 business days.',
     'product.returnsPolicy': 'Return Policy',
     'product.returnsValue': 'We accept returns within 14 days of delivery. The product must be unused and in original packaging.',
+    'product.option.title': 'Select Option',
+    'product.option.standard': 'Standard Candle',
+    'product.option.gift': 'Gift Set (+Box & Card)',
     'products.section.featured': 'FEATURED COLLECTION',
     'products.section.main': 'Shop Essentials',
     'filter.candles': 'Scented Candles',
@@ -68,19 +71,19 @@ const translations = {
     'collection.limited.desc': 'A mystical collection inspired by the secrets of a garden at midnight. Deep, floral, and atmospheric scents for quiet introspection.',
     'collection.signature.title': 'The Quiet Seasons',
     'collection.signature.desc': 'Our core collection celebrating the subtle beauty of nature through the four seasons. Grounding, nostalgic, and pure.',
-    'ai.tagline': 'AI SCENT SOMMELIER',
+    'ai.tagline': 'MEET LITTLE RI',
     'ai.title': 'Describe your mood, Find your scent.',
     'ai.subtitle': 'Tell us how you feel, where you are, or a memory you cherish. Our AI will curate the perfect scent profile for you.',
     'ai.placeholder': 'e.g., "I want to feel like I\'m reading an old book in a rainy cabin..."',
     'ai.button.idle': 'Curate My Scent',
     'ai.button.loading': 'Analyzing Mood...',
-    'ai.error': 'Unable to connect to the Scent Sommelier. Please try again.',
+    'ai.error': 'Unable to connect to Little Ri. Please try again.',
     'ai.result.concept': 'YOUR SCENT CONCEPT',
     'ai.result.notes': 'KEY NOTES',
     'ai.result.why': 'WHY THIS MATCHES',
     'ai.result.again': 'Curate Another',
     'ai.empty.text': 'Your personal scent journey begins here.',
-    'ai.recommendation': 'Our Recommendation',
+    'ai.recommendation': 'Ri Recommends',
     'story.full.title': 'The Narie Journey',
     'story.full.p1': 'Narie was born from a simple desire: to slow down. In the hustle of modern life, we often forget to breathe, to pause, and to appreciate the quiet moments. We started in a small kitchen, experimenting with natural waxes and essential oils, seeking a scent that didn\'t just smell good, but felt good.',
     'story.full.p2': 'Our name comes from the combination of "Natural" and "Reverie". We believe that nature holds the key to our dreams and our healing. Every candle is poured by hand, ensuring that the human touch is never lost in the process. We use only sustainably sourced soy wax and FSC-certified wooden wicks that crackle softly like a tiny fireplace.',
@@ -118,14 +121,50 @@ const translations = {
     'footer.newsletter': 'Newsletter',
     'footer.newsletter_desc': 'Subscribe to receive updates, access to exclusive deals, and more.',
     'footer.subscribe': 'Subscribe',
+    'footer.subscribing': 'Joining...',
+    'footer.subscribe_success': 'Subscribed!',
     'footer.rights': 'All rights reserved.',
     'footer.links.privacy': 'Privacy Policy',
-    'footer.links.terms': 'Terms of Service'
+    'footer.links.terms': 'Terms of Service',
+    
+    // LEGAL CONTENT
+    'legal.privacy.content': `
+      1. INFORMATION COLLECTION
+      We collect personal information such as your name, email address, shipping address, and phone number when you place an order or subscribe to our newsletter. We do not store credit card information on our servers.
+
+      2. USE OF INFORMATION
+      Your information is used solely for processing orders, improving our website, and communicating with you about your purchase or our products.
+
+      3. COOKIES
+      We use cookies to enhance your browsing experience and analyze site traffic. You can choose to disable cookies through your browser settings.
+
+      4. DATA PROTECTION
+      We implement security measures to maintain the safety of your personal information. We do not sell, trade, or otherwise transfer your personally identifiable information to outside parties.
+
+      5. THIRD-PARTY SERVICES
+      We may use third-party services (e.g., payment gateways, shipping providers) who have their own privacy policies. We encourage you to review their policies.
+    `,
+    'legal.terms.content': `
+      1. GENERAL CONDITIONS
+      By accessing this website, you agree to be bound by these Terms of Service. We reserve the right to refuse service to anyone for any reason at any time.
+
+      2. PRODUCTS AND PRICING
+      Prices for our products are subject to change without notice. We reserve the right at any time to modify or discontinue a product without notice. We have made every effort to display as accurately as possible the colors and images of our products.
+
+      3. SHIPPING AND RETURNS
+      Shipping times are estimates and not guarantees. Our return policy lasts 14 days. If 14 days have gone by since your purchase, unfortunately, we cannot offer you a refund or exchange.
+
+      4. INTELLECTUAL PROPERTY
+      All content included on this site, such as text, graphics, logos, images, and software, is the property of Narie Lab Co. and protected by international copyright laws.
+
+      5. GOVERNING LAW
+      These Terms of Service shall be governed by and construed in accordance with the laws of Vietnam.
+    `
   },
   vi: {
     'nav.shop': 'CỬA HÀNG',
     'nav.collections': 'BỘ SƯU TẬP',
-    'nav.ai': 'CHUYÊN GIA AI',
+    'nav.ai': 'BÉ RI',
     'nav.story': 'VỀ NARIE',
     'nav.login': 'ĐĂNG NHẬP',
     'nav.shopAll': 'TẤT CẢ SẢN PHẨM',
@@ -133,7 +172,7 @@ const translations = {
     'hero.title': 'Nâng tầm không gian sống bằng những mùi hương tinh tế.',
     'hero.subtitle': 'Được làm thủ công với sáp đậu nành tự nhiên và bấc gỗ. Một liệu pháp chữa lành cho ngôi nhà của bạn.',
     'hero.cta_shop': 'Khám Phá Bộ Sưu Tập',
-    'hero.cta_ai': 'Tư Vấn Mùi Hương',
+    'hero.cta_ai': 'Hỏi Bé Ri',
     'app.about.title': 'VỀ NARIE',
     'app.about.heading': 'Hơn cả một ngọn nến, là lối sống chữa lành.',
     'app.about.p1': 'Tại Narie, chúng tôi tin rằng mùi hương không chỉ là hương thơm, mà là ký ức, là cảm xúc và là cách để chữa lành tâm hồn. Nến của chúng tôi được chế tác với sự tỉ mỉ cao nhất, sử dụng nguyên liệu bền vững.',
@@ -167,6 +206,9 @@ const translations = {
     'product.shippingValue': 'Miễn phí giao hàng tiêu chuẩn cho đơn hàng trên 1.000.000₫. Thời gian giao hàng dự kiến 3-5 ngày làm việc.',
     'product.returnsPolicy': 'Chính Sách Đổi Trả',
     'product.returnsValue': 'Chúng tôi chấp nhận đổi trả trong vòng 14 ngày kể từ ngày giao hàng. Sản phẩm phải còn nguyên vẹn và chưa qua sử dụng.',
+    'product.option.title': 'Chọn Phân Loại',
+    'product.option.standard': 'Nến Lẻ',
+    'product.option.gift': 'Nến + Hộp Quà (+100k)',
     'products.section.featured': 'BỘ SƯU TẬP NỔI BẬT',
     'products.section.main': 'Thiết Yếu Cho Không Gian',
     'filter.candles': 'Nến Thơm',
@@ -176,19 +218,19 @@ const translations = {
     'collection.limited.desc': 'Một bộ sưu tập huyền bí lấy cảm hứng từ những bí mật của khu vườn lúc nửa đêm. Những mùi hương sâu lắng, nồng nàn và đầy chất thơ.',
     'collection.signature.title': 'The Quiet Seasons',
     'collection.signature.desc': 'Bộ sưu tập cốt lõi tôn vinh vẻ đẹp tinh tế của thiên nhiên qua bốn mùa. Vững chãi, hoài niệm và thuần khiết.',
-    'ai.tagline': 'CHUYÊN GIA MÙI HƯƠNG AI',
+    'ai.tagline': 'BÉ RI',
     'ai.title': 'Mô tả cảm xúc, Tìm hương của bạn.',
-    'ai.subtitle': 'Hãy kể cho chúng tôi cảm giác của bạn, nơi bạn đang ở, hoặc một ký ức bạn trân quý. AI sẽ chọn ra mùi hương hoàn hảo cho riêng bạn.',
+    'ai.subtitle': 'Hãy kể cho chúng tôi cảm giác của bạn, nơi bạn đang ở, hoặc một ký ức bạn trân quý. Bé Ri sẽ chọn ra mùi hương hoàn hảo cho riêng bạn.',
     'ai.placeholder': 'Ví dụ: "Tôi muốn cảm giác như đang đọc sách cũ trong một căn nhà gỗ dưới mưa..."',
     'ai.button.idle': 'Tư Vấn Ngay',
     'ai.button.loading': 'Đang Phân Tích...',
-    'ai.error': 'Không thể kết nối với Chuyên gia mùi hương. Vui lòng thử lại.',
+    'ai.error': 'Không thể kết nối với Bé Ri. Vui lòng thử lại.',
     'ai.result.concept': 'CONCEPT MÙI HƯƠNG',
     'ai.result.notes': 'NỐT HƯƠNG CHÍNH',
     'ai.result.why': 'TẠI SAO LẠI PHÙ HỢP',
     'ai.result.again': 'Tư Vấn Lại',
     'ai.empty.text': 'Hành trình mùi hương cá nhân bắt đầu tại đây.',
-    'ai.recommendation': 'Gợi Ý Sản Phẩm',
+    'ai.recommendation': 'Bé Ri Gợi Ý',
     'story.full.title': 'Hành Trình Narie',
     'story.full.p1': 'Narie được sinh ra từ một mong muốn đơn giản: sống chậm lại. Trong sự hối hả của cuộc sống hiện đại, chúng ta thường quên thở, quên dừng lại và trân trọng những khoảnh khắc yên tĩnh. Chúng tôi bắt đầu trong một căn bếp nhỏ, thử nghiệm với sáp tự nhiên và tinh dầu, tìm kiếm một mùi hương không chỉ thơm, mà còn mang lại cảm giác dễ chịu.',
     'story.full.p2': 'Tên của chúng tôi bắt nguồn từ sự kết hợp của "Natural" (Tự nhiên) và "Reverie" (Mộng mơ). Chúng tôi tin rằng thiên nhiên nắm giữ chìa khóa cho những giấc mơ và sự chữa lành của chúng ta. Mỗi ngọn nến đều được rót bằng tay, đảm bảo rằng sự ấm áp của con người không bao giờ mất đi. Chúng tôi chỉ sử dụng sáp đậu nành nguồn gốc bền vững và bấc gỗ được chứng nhận FSC, tạo ra tiếng tí tách nhẹ nhàng như một lò sưởi nhỏ.',
@@ -226,9 +268,45 @@ const translations = {
     'footer.newsletter': 'Bản Tin',
     'footer.newsletter_desc': 'Đăng ký để nhận cập nhật, ưu đãi độc quyền và nhiều hơn nữa.',
     'footer.subscribe': 'Đăng Ký',
+    'footer.subscribing': 'Đang Xử Lý...',
+    'footer.subscribe_success': 'Đã Đăng Ký!',
     'footer.rights': 'Bảo lưu mọi quyền.',
     'footer.links.privacy': 'Chính Sách Riêng Tư',
-    'footer.links.terms': 'Điều Khoản Dịch Vụ'
+    'footer.links.terms': 'Điều Khoản Dịch Vụ',
+
+    // LEGAL CONTENT
+    'legal.privacy.content': `
+      1. THU THẬP THÔNG TIN
+      Chúng tôi thu thập thông tin cá nhân như tên, địa chỉ email, địa chỉ giao hàng và số điện thoại khi bạn đặt hàng hoặc đăng ký nhận bản tin. Chúng tôi không lưu trữ thông tin thẻ tín dụng trên máy chủ của mình.
+
+      2. SỬ DỤNG THÔNG TIN
+      Thông tin của bạn chỉ được sử dụng để xử lý đơn hàng, cải thiện website và liên lạc với bạn về đơn hàng hoặc sản phẩm của chúng tôi.
+
+      3. COOKIES
+      Chúng tôi sử dụng cookies để nâng cao trải nghiệm duyệt web của bạn và phân tích lưu lượng truy cập trang web. Bạn có thể chọn tắt cookies thông qua cài đặt trình duyệt của mình.
+
+      4. BẢO VỆ DỮ LIỆU
+      Chúng tôi thực hiện các biện pháp bảo mật để duy trì sự an toàn cho thông tin cá nhân của bạn. Chúng tôi không bán, trao đổi hoặc chuyển giao thông tin nhận dạng cá nhân của bạn cho bên thứ ba.
+
+      5. DỊCH VỤ BÊN THỨ BA
+      Chúng tôi có thể sử dụng dịch vụ của bên thứ ba (ví dụ: cổng thanh toán, đơn vị vận chuyển), những bên này có chính sách bảo mật riêng. Chúng tôi khuyến khích bạn xem xét chính sách của họ.
+    `,
+    'legal.terms.content': `
+      1. ĐIỀU KHOẢN CHUNG
+      Bằng cách truy cập trang web này, bạn đồng ý bị ràng buộc bởi các Điều khoản Dịch vụ này. Chúng tôi bảo lưu quyền từ chối dịch vụ cho bất kỳ ai vì bất kỳ lý do gì vào bất kỳ lúc nào.
+
+      2. SẢN PHẨM VÀ GIÁ CẢ
+      Giá của các sản phẩm có thể thay đổi mà không cần thông báo trước. Chúng tôi bảo lưu quyền sửa đổi hoặc ngừng sản phẩm vào bất kỳ lúc nào. Chúng tôi đã nỗ lực hết sức để hiển thị chính xác nhất có thể màu sắc và hình ảnh của sản phẩm.
+
+      3. GIAO HÀNG VÀ ĐỔI TRẢ
+      Thời gian giao hàng là ước tính và không đảm bảo. Chính sách đổi trả của chúng tôi kéo dài 14 ngày. Nếu đã qua 14 ngày kể từ khi bạn mua hàng, rất tiếc chúng tôi không thể hoàn tiền hoặc đổi hàng cho bạn.
+
+      4. SỞ HỮU TRÍ TUỆ
+      Tất cả nội dung trên trang web này, chẳng hạn như văn bản, đồ họa, logo, hình ảnh và phần mềm, là tài sản của Narie Lab Co. và được bảo vệ bởi luật bản quyền quốc tế.
+
+      5. LUẬT ÁP DỤNG
+      Các Điều khoản Dịch vụ này sẽ được điều chỉnh và giải thích theo luật pháp của Việt Nam.
+    `
   }
 };
 
